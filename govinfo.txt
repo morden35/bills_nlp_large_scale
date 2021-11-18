@@ -1,0 +1,27 @@
+https://api.govinfo.gov/docs/
+
+1. get all 'collections' aka all Bill names for each congress (ex 116 back to 106)
+
+curl -X 'GET' \
+  'https://api.govinfo.gov/collections/BILLS/1990-05-13T02%3A22%3A08Z?offset=0&pageSize=100&congress=116&api_key=nt5nhSpwSqMbrGJ7hcsBkXFI1mfk80X0fexbnt45' \
+  -H 'accept: application/json'
+
+or 
+
+https://api.govinfo.gov/collections/BILLS/1990-05-13T02%3A22%3A08Z?offset=0&pageSize=100&congress=116&api_key=nt5nhSpwSqMbrGJ7hcsBkXFI1mfk80X0fexbnt45
+
+
+2. IF 'climate' in 'title from previous query, 'exctract 'packageId'.
+This is the bill identifier we will use in the next api call.
+
+3. The 'packageId' from previous step is inserted into this api call
+
+curl -X 'GET' \
+  'https://api.govinfo.gov/packages/BILLS-116hr6467ih/summary?api_key=nt5nhSpwSqMbrGJ7hcsBkXFI1mfk80X0fexbnt45' \
+  -H 'accept: */*'
+
+or 
+
+https://api.govinfo.gov/packages/BILLS-116hr6467ih/summary?api_key=nt5nhSpwSqMbrGJ7hcsBkXFI1mfk80X0fexbnt45
+
+4. This api call will return json with "download"["txtLink"]. This is the bill tex that we need.
