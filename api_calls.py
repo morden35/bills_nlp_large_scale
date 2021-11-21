@@ -11,14 +11,18 @@ def get_offset():
     so we need to call 20450/100 = 205 times, changing the offset flag each time.
     '''
 
-    total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162}
+    # total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162}
+    # total_bill_dict = {'111': 18231, '110': 19790, '109': 17403, '108': 15377, '107': 14882}
+    total_bill_dict = {'106': 16052, '105': 13126, '104': 11434, '103': 14141}
 
-    all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': []}
-
+    # all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': []}
+    # all_climate_bill_ids = {'111': [], '110': [], '109': [], '108': [], '107': []}
+    all_climate_bill_ids = {'106': [], '105': [], '104': [], '103': []}
 
     for congress in total_bill_dict.keys():
         end_range = total_bill_dict[congress]
-        # being limited at 9980 for all years
+        # being limited at 9800 for all years
+        # https://github.com/usgpo/api/issues/19#issuecomment-428292313
         for x in range(0, 9800, 100):
             subset_climate_bill_ids = get_bill_ids(offset=x, congress=congress)
             all_climate_bill_ids[congress].extend(subset_climate_bill_ids)
@@ -65,7 +69,9 @@ def get_package(all_climate_bill_ids):
     Given a list of bill ids (pre filtered for those that contain 'climate' in title),
     this function makes a govinfo API call to request the bill text.
     '''
-    all_bills = {'116': {}, '115': {}, '114': {}, '113': {}, '112': {}}
+    # all_bills = {'116': {}, '115': {}, '114': {}, '113': {}, '112': {}}
+    # all_bills = {'111': {}, '110': {}, '109': {}, '108': {}, '107': {}}
+    all_bills = {'106': {}, '105': {}, '104': {}, '103': {}}
 
     for congress in all_climate_bill_ids.keys():
         for bill_id in all_climate_bill_ids[congress]:
@@ -75,7 +81,27 @@ def get_package(all_climate_bill_ids):
             # data = r.json()
             all_bills[congress][bill_id] = r.content
     
-    print(all_bills)
+    # print(all_bills)
+    for key, val in all_bills.items():
+        print(key)
+        print(len(val))
+        # congress - number of bills with 'climate' or 'Climate' in title (limited by first 10,000)
+        # 116 - 50
+        # 115 - 15
+        # 114 - 16
+        # 113 - 7
+        # 112 - 11
+        # 111 - 14
+        # 110 - 20
+        # 109 - 4
+        # 108 - 2
+        # 107 - 2
+        # 106 - 3
+        # 105 - 4
+        # 104 - 0
+        # 103 - 2
+
+        # 150 total out of 140,000 searched
     return all_bills
 
 
