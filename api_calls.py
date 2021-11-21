@@ -10,14 +10,20 @@ def get_offset():
     number of total bills from that year. For example, Congress 116 had 20450,
     so we need to call 20450/100 = 205 times, changing the offset flag each time.
     '''
-
+    
+    total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162,
+                        '111': 18231, '110': 19790, '109': 17403, '108': 15377, '107': 14882,
+                        '106': 16052, '105': 13126, '104': 11434, '103': 14141}
     # total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162}
     # total_bill_dict = {'111': 18231, '110': 19790, '109': 17403, '108': 15377, '107': 14882}
-    total_bill_dict = {'106': 16052, '105': 13126, '104': 11434, '103': 14141}
+    # total_bill_dict = {'106': 16052, '105': 13126, '104': 11434, '103': 14141}
 
+    all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': [],
+                            '111': [], '110': [], '109': [], '108': [], '107': [],
+                            '106': [], '105': [], '104': [], '103': []}
     # all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': []}
     # all_climate_bill_ids = {'111': [], '110': [], '109': [], '108': [], '107': []}
-    all_climate_bill_ids = {'106': [], '105': [], '104': [], '103': []}
+    # all_climate_bill_ids = {'106': [], '105': [], '104': [], '103': []}
 
     for congress in total_bill_dict.keys():
         end_range = total_bill_dict[congress]
@@ -44,9 +50,10 @@ def get_bill_ids(lastModifiedStartDate='1990-05-13T02:22:08Z', offset=0, pageSiz
     '''
 
     url = f'https://api.govinfo.gov/collections/BILLS/{lastModifiedStartDate}?offset={offset}&pageSize={pageSize}&congress={congress}&api_key={API_KEY}'
+    # url = f'https://api.govinfo.gov/published/1990-01-01?offset={offset}&pageSize={pageSize}&collection=BILLS&congress={congress}&api_key={API_KEY}'
     PARAMS = {'headers': 'accept: application/json'}
 
-    r = requests.get(url = url, params = PARAMS)
+    r = requests.get(url=url, params=PARAMS)
     
     data = r.json()
     # print(data.keys())
@@ -69,9 +76,13 @@ def get_package(all_climate_bill_ids):
     Given a list of bill ids (pre filtered for those that contain 'climate' in title),
     this function makes a govinfo API call to request the bill text.
     '''
+
+    all_bills = {'116': {}, '115': {}, '114': {}, '113': {}, '112': {},
+                '111': {}, '110': {}, '109': {}, '108': {}, '107': {},
+                '106': {}, '105': {}, '104': {}, '103': {}}
     # all_bills = {'116': {}, '115': {}, '114': {}, '113': {}, '112': {}}
     # all_bills = {'111': {}, '110': {}, '109': {}, '108': {}, '107': {}}
-    all_bills = {'106': {}, '105': {}, '104': {}, '103': {}}
+    # all_bills = {'106': {}, '105': {}, '104': {}, '103': {}}
 
     for congress in all_climate_bill_ids.keys():
         for bill_id in all_climate_bill_ids[congress]:
@@ -82,9 +93,9 @@ def get_package(all_climate_bill_ids):
             all_bills[congress][bill_id] = r.content
     
     # print(all_bills)
-    for key, val in all_bills.items():
-        print(key)
-        print(len(val))
+    # for key, val in all_bills.items():
+    #     print(key)
+    #     print(len(val))
         # congress - number of bills with 'climate' or 'Climate' in title (limited by first 10,000)
         # 116 - 50
         # 115 - 15
@@ -101,9 +112,14 @@ def get_package(all_climate_bill_ids):
         # 104 - 0
         # 103 - 2
 
-        # 150 total out of 140,000 searched
+        # 150 total out of 140,000 searched (0.001%)
     return all_bills
 
 
 if __name__ == '__main__':
     get_offset()
+
+# this link is useful for defining terminology
+# https://www.govinfo.gov/help/bills
+# docClass: s (senate), hr (house), hres (houes simple resolution), sconres (senate concurrent resolution)
+# billVersion: as, ash, ath, ats, cdh, cds, cph, cps, eah, eas, eh, enr.
