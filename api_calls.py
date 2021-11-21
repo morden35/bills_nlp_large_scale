@@ -14,61 +14,67 @@ def get_offset():
     total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162,
                         '111': 18231, '110': 19790, '109': 17403, '108': 15377, '107': 14882,
                         '106': 16052, '105': 13126, '104': 11434, '103': 14141}
-    # total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162}
-    # total_bill_dict = {'111': 18231, '110': 19790, '109': 17403, '108': 15377, '107': 14882}
-    # total_bill_dict = {'106': 16052, '105': 13126, '104': 11434, '103': 14141}
 
     all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': [],
                             '111': [], '110': [], '109': [], '108': [], '107': [],
                             '106': [], '105': [], '104': [], '103': []}
-    # all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': []}
-    # all_climate_bill_ids = {'111': [], '110': [], '109': [], '108': [], '107': []}
-    # all_climate_bill_ids = {'106': [], '105': [], '104': [], '103': []}
 
-    for congress in total_bill_dict.keys():
-        end_range = total_bill_dict[congress]
-        # being limited at 9800 for all years
-        # https://github.com/usgpo/api/issues/19#issuecomment-428292313
-        for x in range(0, 9800, 100):
-            subset_climate_bill_ids = get_bill_ids(offset=x, congress=congress)
-            all_climate_bill_ids[congress].extend(subset_climate_bill_ids)
-            # if len(subset_climate_bill_ids) > 0:
-                # for c_id in subset_climate_bill_ids:
-            # all_climate_bill_ids[] (c_id)
-            print(x)
-            # break
+    docClass = ['s', 'hr', 'hres', 'sconres']
+    billVersion = ['as', 'ash', 'ath', 'ats', 'cdh', 'cds', 'cph', 'cps', 'eah',
+                   'eas', 'eh', 'eph', 'phs', 'enr', 'es', 'fah', 'fph', 'fps',
+                   'hdh', 'hds', 'ih', 'iph', 'ips', 'is', 'lth', 'lts', 'oph',
+                   'ops', 'pav', 'pch', 'pcs', 'pp', 'pap', 'pwah', 'rah',
+                   'ras', 'rch', 'rcs', 'rdh', 'rds', 'reah', 'res', 'renr',
+                   'rfh', 'rfs', 'rh', 'rih', 'ris', 'rs', 'rth', 'rts', 'sas',
+                   'sc']
+
+    for congress in total_bill_dict.keys(): # 14 loops
+        for dclass in docClass: # 4 loops
+            for version in billVersion: # 53 loops
+                # end_range = total_bill_dict[congress]
+                # being limited at 9800 for all years
+                # https://github.com/usgpo/api/issues/19#issuecomment-428292313
+                for x in range(0, 10000, 100):
+                    subset_climate_bill_ids = get_bill_ids(offset=x, congress=congress, docClass=dclass, billVersion=version)
+                    if subset_climate_bill_ids:
+                        all_climate_bill_ids[congress].extend(subset_climate_bill_ids)
+                    # if len(subset_climate_bill_ids) > 0:
+                        # for c_id in subset_climate_bill_ids:
+                    # all_climate_bill_ids[] (c_id)
+                    print(x)
+                    # break
 
     print(all_climate_bill_ids)
     return get_package(all_climate_bill_ids)
 
 
-def get_bill_ids(lastModifiedStartDate='1990-05-13T02:22:08Z', offset=0, pageSize=100, congress='116'):
+def get_bill_ids(lastModifiedStartDate='1990-05-13T02:22:08Z', offset=0, pageSize=100, congress='116', docClass='s', billVersion='is'):
     '''
     Given an offset value and congress number, this function makes a govinfo
     API call to request a list of 'collections' (bill ids). We will filter for
     bill ids that contain the word 'climate' or 'Climate' in the title.
     '''
 
-    url = f'https://api.govinfo.gov/collections/BILLS/{lastModifiedStartDate}?offset={offset}&pageSize={pageSize}&congress={congress}&api_key={API_KEY}'
+    url = f'https://api.govinfo.gov/collections/BILLS/{lastModifiedStartDate}?offset={offset}&pageSize={pageSize}&congress={congress}&docClass={docClass}&billVersion={billVersion}&api_key={API_KEY}'
     # url = f'https://api.govinfo.gov/published/1990-01-01?offset={offset}&pageSize={pageSize}&collection=BILLS&congress={congress}&api_key={API_KEY}'
     PARAMS = {'headers': 'accept: application/json'}
 
     r = requests.get(url=url, params=PARAMS)
-    
-    data = r.json()
-    # print(data.keys())
+    if r.status_code == 200:
+        data = r.json()
+        # print(data.keys())
 
-    # if len(data) > 1:
-    packages = data['packages']
-    climate_bill_ids = []
-    for package in packages:
-        if re.search(r"(C|c)limate", package['title']):
-            climate_bill_ids.append(package['packageId'])
-    # climate_bill_ids_dict = {congress: climate_bill_ids}
-    
-    # print(climate_bill_ids)
-    return climate_bill_ids
-    # return None
+        # if len(data) > 1:
+        packages = data['packages']
+        climate_bill_ids = []
+        for package in packages:
+            if re.search(r"(C|c)limate", package['title']):
+                climate_bill_ids.append(package['packageId'])
+        # climate_bill_ids_dict = {congress: climate_bill_ids}
+        
+        # print(climate_bill_ids)
+        return climate_bill_ids
+    return None
 
 
 def get_package(all_climate_bill_ids):
@@ -123,3 +129,9 @@ if __name__ == '__main__':
 # https://www.govinfo.gov/help/bills
 # docClass: s (senate), hr (house), hres (houes simple resolution), sconres (senate concurrent resolution)
 # billVersion: as, ash, ath, ats, cdh, cds, cph, cps, eah, eas, eh, enr.
+
+# 2016
+# s - 5977
+# hr - 11475 (9030 ih, 214)
+# hres - 1451
+# sconres - 99
