@@ -1,9 +1,12 @@
 import requests
 import re
+import time
+import json
+import sys
 
 API_KEY = 'nt5nhSpwSqMbrGJ7hcsBkXFI1mfk80X0fexbnt45'
 
-def get_offset():
+def get_offset(congress="116"):
     '''
     The govinfo API allows us to query 100 'collections' at a time. For a given
     congressional year, we need to call get_bill_ids() x times, depending on the
@@ -11,13 +14,15 @@ def get_offset():
     so we need to call 20450/100 = 205 times, changing the offset flag each time.
     '''
     
-    total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162,
-                        '111': 18231, '110': 19790, '109': 17403, '108': 15377, '107': 14882,
-                        '106': 16052, '105': 13126, '104': 11434, '103': 14141}
+    # total_bill_dict = {'116': 20450, '115': 18510, '114': 16092, '113': 13770, '112': 15162,
+    #                     '111': 18231, '110': 19790, '109': 17403, '108': 15377, '107': 14882,
+    #                     '106': 16052, '105': 13126, '104': 11434, '103': 14141}
 
-    all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': [],
-                            '111': [], '110': [], '109': [], '108': [], '107': [],
-                            '106': [], '105': [], '104': [], '103': []}
+    # all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': [],
+    #                         '111': [], '110': [], '109': [], '108': [], '107': [],
+    #                         '106': [], '105': [], '104': [], '103': []}
+
+    all_climate_bill_ids = {congress: []}
 
     docClass = ['s', 'hr', 'hres', 'sconres']
     billVersion = ['as', 'ash', 'ath', 'ats', 'cdh', 'cds', 'cph', 'cps', 'eah',
@@ -28,23 +33,31 @@ def get_offset():
                    'rfh', 'rfs', 'rh', 'rih', 'ris', 'rs', 'rth', 'rts', 'sas',
                    'sc']
 
-    for congress in total_bill_dict.keys(): # 14 loops
-        for dclass in docClass: # 4 loops
-            for version in billVersion: # 53 loops
-                # end_range = total_bill_dict[congress]
-                # being limited at 9800 for all years
-                # https://github.com/usgpo/api/issues/19#issuecomment-428292313
-                for x in range(0, 10000, 100):
-                    subset_climate_bill_ids = get_bill_ids(offset=x, congress=congress, docClass=dclass, billVersion=version)
-                    if subset_climate_bill_ids:
-                        all_climate_bill_ids[congress].extend(subset_climate_bill_ids)
-                    # if len(subset_climate_bill_ids) > 0:
-                        # for c_id in subset_climate_bill_ids:
-                    # all_climate_bill_ids[] (c_id)
-                    print(x)
-                    # break
+    # 296,800 total loops 
+
+    start_time = time.time()
+    # for num1, cong in enumerate(all_climate_bill_ids.keys()): # 1 loop 
+    for num2, dclass in enumerate(docClass): # 4 loops
+        for num3, version in enumerate(billVersion): # 53 loops
+            now = time.time()
+            print(f"{((num2 * num3) / 212)*100}% done")
+            print(f"{(now - start_time)/60} minutes elapsed")
+            # end_range = total_bill_dict[congress]
+            # being limited at 9800 for all years
+            # https://github.com/usgpo/api/issues/19#issuecomment-428292313
+            for x in range(0, 10000, 100): # 100 loops
+                subset_climate_bill_ids = get_bill_ids(offset=x, congress=congress, docClass=dclass, billVersion=version)
+                if subset_climate_bill_ids:
+                    all_climate_bill_ids[congress].extend(subset_climate_bill_ids)
+                # if len(subset_climate_bill_ids) > 0:
+                    # for c_id in subset_climate_bill_ids:
+                # all_climate_bill_ids[] (c_id)
+                # print(x)
+                # break
 
     print(all_climate_bill_ids)
+    with open(f'{congress}_ids.json', 'w') as outfile:
+        json.dump(all_climate_bill_ids, outfile)
     return get_package(all_climate_bill_ids)
 
 
@@ -119,11 +132,14 @@ def get_package(all_climate_bill_ids):
         # 103 - 2
 
         # 150 total out of 140,000 searched (0.001%)
+    with open(f'{congress}_bills.json', 'w') as outfile:
+        json.dump(all_bills, outfile)
     return all_bills
 
 
 if __name__ == '__main__':
-    get_offset()
+    congress = sys.argv[1]
+    get_offset(congress)
 
 # this link is useful for defining terminology
 # https://www.govinfo.gov/help/bills
