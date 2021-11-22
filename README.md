@@ -1,7 +1,7 @@
 Team members:
-James Midkiff
-Michelle Orden
-Kelly Yang
+James Midkiff,
+Michelle Orden,
+Kelly Yang,
 
 Source for statistics: https://www.govtrack.us/congress/bills/statistics \
 Our planned data source: https://openstates.org/us/bills/
