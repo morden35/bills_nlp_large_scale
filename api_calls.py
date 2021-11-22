@@ -56,7 +56,7 @@ def get_offset(congress="116"):
                 # break
 
     print(all_climate_bill_ids)
-    with open(f'{congress}_ids.json', 'w') as outfile:
+    with open(f'climate_ids/{congress}_ids.json', 'w') as outfile:
         json.dump(all_climate_bill_ids, outfile)
     return get_package(all_climate_bill_ids)
 
@@ -109,7 +109,8 @@ def get_package(all_climate_bill_ids):
             PARAMS = {'headers': 'accept: */*'}
             r = requests.get(url = url, params = PARAMS)
             # data = r.json()
-            all_bills[congress][bill_id] = r.content
+            # need to decode the bytes object
+            all_bills[congress][bill_id] = r.content.decode('utf8')
     
     # print(all_bills)
     # for key, val in all_bills.items():
@@ -132,7 +133,7 @@ def get_package(all_climate_bill_ids):
         # 103 - 2
 
         # 150 total out of 140,000 searched (0.001%)
-    with open(f'{congress}_bills.json', 'w') as outfile:
+    with open(f'climate_bills/{congress}_bills.json', 'w') as outfile:
         json.dump(all_bills, outfile)
     return all_bills
 
