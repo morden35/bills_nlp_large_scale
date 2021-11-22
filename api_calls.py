@@ -44,6 +44,7 @@ def get_offset(congress="116"):
     start_time = time.time()
     for num2, dclass in enumerate(docClass): # 4 loops
         for num3, version in enumerate(billVersion): # 53 loops
+            print(f"{((len(billVersion)*num2)+(num3 + 1))/(len(docClass)*len(billVersion))*100}% done")
             now = time.time()
             # print(f"{((num2 * num3) / 212)*100}% done")
             print(f"{(now - start_time)/60} minutes elapsed")
