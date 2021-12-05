@@ -3,6 +3,12 @@ import re
 import time
 import json
 import sys
+import boto3
+
+# Initialize Boto Client for S3
+s3 = boto3.client('s3')
+s3_resource = boto3.resource('s3')
+bucket_resource = s3_resource.Bucket('macs30123-bills')
 
 API_KEY = 'nt5nhSpwSqMbrGJ7hcsBkXFI1mfk80X0fexbnt45'
 
@@ -19,18 +25,18 @@ def get_offset(congress="116"):
     Inputs:
         congress (str) - the congress number we want to query (default is 116)
     Returns:
-        get_package(all_climate_bill_ids, congress) - This function calls the
+        get_package(all_bill_ids, congress) - This function calls the
             get_package() function which will get all bill texts for the list
-            of all_climate_bill_ids
+            of all_bill_ids
 
-    This function also writes all all_climate_bill_ids to json file.
+    This function also writes all all_bill_ids to json file.
     '''
 
-    # all_climate_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': [],
+    # all_bill_ids = {'116': [], '115': [], '114': [], '113': [], '112': [],
     #                         '111': [], '110': [], '109': [], '108': [], '107': [],
     #                         '106': [], '105': [], '104': [], '103': []}
 
-    all_climate_bill_ids = {congress: []}
+    all_bill_ids = {congress: []}
 
     docClass = ['s', 'hr', 'hres', 'sconres']
     billVersion = ['as', 'ash', 'ath', 'ats', 'cdh', 'cds', 'cph', 'cps', 'eah',
@@ -42,26 +48,34 @@ def get_offset(congress="116"):
                    'sc']
 
     start_time = time.time()
-    for num2, dclass in enumerate(docClass): # 4 loops
-        for num3, version in enumerate(billVersion): # 53 loops
-            print(f"{((len(billVersion)*num2)+(num3 + 1))/(len(docClass)*len(billVersion))*100}% done")
-            now = time.time()
-            # print(f"{((num2 * num3) / 212)*100}% done")
-            print(f"{(now - start_time)/60} minutes elapsed")
-            # being limited at 10000 for all years
-            # https://github.com/usgpo/api/issues/19#issuecomment-428292313
-            for x in range(0, 10000, 100): # 100 loops
-                subset_climate_bill_ids = get_bill_ids(offset=x,
-                                                       congress=congress,
-                                                       docClass=dclass,
-                                                       billVersion=version)
-                if subset_climate_bill_ids:
-                    all_climate_bill_ids[congress].extend(subset_climate_bill_ids)
+    # for num2, dclass in enumerate(docClass): # 4 loops
+        # for num3, version in enumerate(billVersion): # 53 loops
+    dclass = "hr"
+    version = "ih"
+    # print(f"{((len(billVersion)*num2)+(num3 + 1))/(len(docClass)*len(billVersion))*100}% done")
+    now = time.time()
+    # print(f"{((num2 * num3) / 212)*100}% done")
+    # print(f"{(now - start_time)/60} minutes elapsed")
+    # being limited at 10000 for all years
+    # https://github.com/usgpo/api/issues/19#issuecomment-428292313
+    for x in range(0, 10000, 100): # 100 loops
+        print(x)
+        subset_bill_ids = get_bill_ids(offset=x,
+                                                congress=congress,
+                                                docClass=dclass,
+                                                billVersion=version)
+        if subset_bill_ids:
+            all_bill_ids[congress].extend(subset_bill_ids)
 
-    print(all_climate_bill_ids)
-    with open(f'climate_ids/{congress}_ids.json', 'w') as outfile:
-        json.dump(all_climate_bill_ids, outfile)
-    return get_package(all_climate_bill_ids, congress)
+    print(all_bill_ids)
+    # NEEDS TO GO IN S3
+    # bucket_resource.put_object(all_bill_ids)
+    bucket_resource.put_object(Key=f'{congress}', Body=json.dumps(all_bill_ids))
+
+    print("check bucket")
+    # with open(f'bill_ids/{congress}_ids.json', 'w') as outfile:
+        # json.dump(all_bill_ids, outfile)
+    return get_package(all_bill_ids, congress)
 
 
 def get_bill_ids(lastModifiedStartDate='1990-05-13T02:22:08Z',
@@ -98,24 +112,24 @@ def get_bill_ids(lastModifiedStartDate='1990-05-13T02:22:08Z',
         data = r.json()
 
         packages = data['packages']
-        climate_bill_ids = []
-        for package in packages:
-            if re.search(r"(C|c)limate", package['title']):
-                climate_bill_ids.append(package['packageId'])
+        # climate_bill_ids = []
+        # for package in packages:
+            # if re.search(r"(C|c)limate", package['title']):
+                # climate_bill_ids.append(package['packageId'])
         # climate_bill_ids_dict = {congress: climate_bill_ids}
         
         # print(climate_bill_ids)
-        return climate_bill_ids
+        return packages
     return None
 
 
-def get_package(all_climate_bill_ids, congress):
+def get_package(all_bill_ids, congress):
     '''
     Given a list of bill ids (pre filtered for those that contain 'climate' in
     title), this function makes a govinfo API call to request the bill text.
 
     Inputs:
-        all_climate_bill_ids (dict) - A dictionary with the congress number as
+        all_bill_ids (dict) - A dictionary with the congress number as
             the key, and a list of climate_bill_ids (list of bill ids) as the
             value
         congress (str) - the congress number
@@ -131,15 +145,21 @@ def get_package(all_climate_bill_ids, congress):
     #             '111': {}, '110': {}, '109': {}, '108': {}, '107': {},
     #             '106': {}, '105': {}, '104': {}, '103': {}}
 
-    # for congress in all_climate_bill_ids.keys():
-    for bill_id in all_climate_bill_ids[congress]:
+    # for congress in all_bill_ids.keys():
+    for package in all_bill_ids[congress]:
+        bill_id = package["packageId"]
+        # url = f"https://api.govinfo.gov/packages/{bill_id}/summary?api_key={API_KEY}"
         url = f'https://api.govinfo.gov/packages/{bill_id}/htm?api_key={API_KEY}'
         PARAMS = {'headers': 'accept: */*'}
+        # PARAMS = {'headers': 'accept: application/json'}
         r = requests.get(url = url, params = PARAMS)
         # need to decode the bytes object
+        # bill_summary = json.loads(r.content)
+        # bill_text = json.loads(r.content)["download"]["txtLink"]
         all_bills[congress][bill_id] = r.content.decode('utf8')
 
-    with open(f'climate_bills/{congress}_bills.json', 'w') as outfile:
+    # NEEDS TO GO IN S3
+    with open(f'bills/{congress}_bills.json', 'w') as outfile:
         json.dump(all_bills, outfile)
     # return all_bills
 
