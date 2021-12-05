@@ -4,11 +4,12 @@ Group Members: James Midkiff, Michelle Orden, Kelly Yang
 nlp.py Code Author: James Midkiff
 '''
 
-# Dask Code, intended to be run on HPC such as Midway at UChicago
+# Dask Code, intended to be run on HPC such as Midway2 at UChicago
 from dask_jobqueue import SLURMCluster
 from dask.distributed import Client
 from dask.dataframe import *
 from dask.bytes import *
+import sys
 import dask
 import boto3
 import pandas as pd
@@ -61,22 +62,26 @@ def main():
             data = extract_bill_info(data)
             break
 
+n_cores = sys.argv[1]
+credentials_file = sys.argv[2]
 if __name__ == '__main__': 
-    n_cores=10
+    # module load python/anaconda-2019.03
+    # scp 'D:\Everything\UChicago\Fall 2021\MACS 30123\Project\credentials.txt' "jmidkiff@midway2.rcc.uchicago.edu:/home/jmidkiff/PROJECT_MACS30123/credentials.txt"    n_cores=10
     # Compose SLURM script
-    cluster = SLURMCluster(queue='broadwl', cores=n_cores, memory='5GB', 
-                        processes=10, walltime='03:00:00', interface='ib0',
-                        job_extra=['--account=macs30123'])
+    print(n_cores, '\n', credentials_file)
+    # cluster = SLURMCluster(queue='broadwl', cores=n_cores, memory='5GB', 
+    #                     processes=10, walltime='03:00:00', interface='ib0',
+    #                     job_extra=['--account=macs30123'])
 
-    # Request resources
-    cluster.scale(jobs=1)
+    # # Request resources
+    # cluster.scale(jobs=1)
 
-    client = Client(cluster)
-    print(client.dashboard_link)
+    # client = Client(cluster)
+    # print(client.dashboard_link)
 
-    # Get data
-    AWS_KEY_ID = 'ASIASWCDU7BJZKKV5L6P'
-    AWS_SECRET = 'Q3KtTcZY1RbQrCNvRE1pAqFg545t5oEatRit9EeC'
-    AWS_SESSION = 'FwoGZXIvYXdzEKP//////////wEaDLXlpj9IsP7+UYUDwCLFAVoeKYXlvn5F6XmSqLHADKpU40KZQSSXnYKI2ujwKOvBiOu9pLvm5IrvB4o/yUJm2fE/h5cpqT2kOzgJVJGyPPUK+JxzBkH+8ydmbRdIKbEE7PDsZWxJLA9I0qxLGUYMl9jrNl8FlfNNn6SZCfd7EOtgQbFFFqPjQeRhAvqJjpep4miA/McfwXBvQXNI9MspJQ5psUUYV+70PO+rh+5/21VbMj2Kfa8gKWLcpINsI0RDZOXyuex3eHfejmhXzA7vTpLSX7JuKJ+5sI0GMi3gZeg5v5qxGMns7yjSU0tBC5i3fTsZqEIUuBtnpNdXx0Ngd9xNV8dKVxsXG8E='
+    # # Get data
+    # AWS_KEY_ID = 'ASIASWCDU7BJZKKV5L6P'
+    # AWS_SECRET = 'Q3KtTcZY1RbQrCNvRE1pAqFg545t5oEatRit9EeC'
+    # AWS_SESSION = 'FwoGZXIvYXdzEKP//////////wEaDLXlpj9IsP7+UYUDwCLFAVoeKYXlvn5F6XmSqLHADKpU40KZQSSXnYKI2ujwKOvBiOu9pLvm5IrvB4o/yUJm2fE/h5cpqT2kOzgJVJGyPPUK+JxzBkH+8ydmbRdIKbEE7PDsZWxJLA9I0qxLGUYMl9jrNl8FlfNNn6SZCfd7EOtgQbFFFqPjQeRhAvqJjpep4miA/McfwXBvQXNI9MspJQ5psUUYV+70PO+rh+5/21VbMj2Kfa8gKWLcpINsI0RDZOXyuex3eHfejmhXzA7vTpLSX7JuKJ+5sI0GMi3gZeg5v5qxGMns7yjSU0tBC5i3fTsZqEIUuBtnpNdXx0Ngd9xNV8dKVxsXG8E='
 
-    main()
+    # main()
