@@ -77,7 +77,7 @@ def main(credentials):
     print(f'\nRequired {round(end-start, 2)} to process')
     
     r_df.to_csv('data.csv')
-    s3.put_object(Bucket='macs30123-bills', Key=f, ACL='public-read')
+    s3.put_object(Bucket='macs30123-bills', Key='data.csv', ACL='public-read')
 
 credentials_file = int(sys.argv[1])
 if __name__ == '__main__': 
