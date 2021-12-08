@@ -1,4 +1,4 @@
-# Predicting Congressional Bill Passage using Machine Learning and Large-Scale Computing Methods
+# Predicting Congressional Bill Outcomes using Machine Learning and Large-Scale Computing Methods
 
 ## Team members:
 James Midkiff<br/>
