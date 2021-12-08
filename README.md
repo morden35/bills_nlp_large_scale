@@ -1,9 +1,9 @@
 # Predicting Congressional Bill Passage using Machine Learning and Large-Scale Computing Methods
 
 ## Team members:
-James Midkiff
-Michelle Orden
-Kelly Yang
+James Midkiff<br/>
+Michelle Orden<br/>
+Kelly Yang<br/>
 
 ## Introduction
 
