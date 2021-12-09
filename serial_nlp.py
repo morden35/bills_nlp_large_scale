@@ -1,10 +1,9 @@
 '''
 Natural Language Processing of Congressional Bills and Resolutions
 Group Members: James Midkiff, Michelle Orden, Kelly Yang
-nlp.py Code Author: James Midkiff
+serial_nlp.py Code Author: James Midkiff
 '''
 
-# Dask Code, intended to be run on HPC such as Midway2 at UChicago
 import sys
 import boto3
 import pandas as pd
@@ -12,8 +11,6 @@ import util
 import time
 
 def extract_bill_info(data): 
-    '''
-    '''
     # Getting info about bills from bill id's
     data['type'] = data.index.str.extract('(?<=\d)(\D+)(?=\d)', expand=False)
     data['outcome'] = data.index.str.extract('((?<=\d)\D+$)', expand=False)
@@ -28,7 +25,7 @@ def extract_bill_info(data):
         value='', regex=True))
     data['text'] = data['text'].replace(to_replace=['\s{2,}'], value=' ', regex=True)
 
-    # Only counts text after the following words appear
+    # Only counts text after the following words appear:
     pattern = "A BILL|RESOLUTION|AN ACT|An Act|AMENDMENT|CONCURRENT RESOLUTION"
     data['word_count'] = (data['text'].str.split(pat=pattern, n=1) 
         .apply(lambda x: x[1] if len(x) > 1 else x[0])
@@ -48,6 +45,7 @@ def extract_bill_info(data):
     return data
 
 def main(credentials): 
+    # Initialize s3 client with credentials
     s3 = boto3.client('s3',
         region_name='us-east-1',
         aws_access_key_id=credentials['aws_access_key_id'],
@@ -63,7 +61,7 @@ def main(credentials):
         if 'bills' in name and 'csv' not in name: 
             print(f'Extracting bills from {name}, file_counter: {file_counter}')
             d = s3.get_object(Bucket='macs30123-bills', Key=name)['Body'].read() # Get individual file
-            d = pd.read_json(d) # Unable to figure out how to read the bytes stream without resorting to pandas
+            d = pd.read_json(d) 
             session = d.columns[0] # Session number
             d['session'] = session
             d = d.rename(columns={session: 'text'}) # Rename to text
@@ -76,14 +74,18 @@ def main(credentials):
     end = time.time()
     print(f'\nRequired {round(end-start, 2)} to process')
     
-    r_df.to_csv('data.csv')
-    s3.put_object(Bucket='macs30123-bills', Key='data.csv', ACL='public-read')
+    # Print to CSV and then upload to S3
+    r_df.to_csv('data_bills.csv')
+    s3.upload_file(Filename='data_bills.csv', Bucket='macs30123-bills', Key='data.csv', 
+        ExtraArgs={'ACL':'public-read'})
 
+# Entry point for file. Must run in same location as credentials file, inputting 
+# credentials file as command line argument
+# I.e. run the following from the command line after updating credentials: 
+# python credentials.txt
 credentials_file = str(sys.argv[1])
 if __name__ == '__main__': 
-    # module load python/anaconda-2019.03
-    # scp 'D:\Everything\UChicago\Fall 2021\MACS 30123\Project\credentials.txt' "jmidkiff@midway2.rcc.uchicago.edu:/home/jmidkiff/PROJECT_MACS30123/credentials.txt" 
-    # Compose SLURM script
+    # Load Credentials as a system argument
     credentials = {}
     with open(credentials_file, 'r', encoding='utf-8') as f:
         for line in f: 
