@@ -12,7 +12,7 @@ The United States is becoming more politically divided over time, making it more
 
 ## Domain Knowledge
 
-To give some context to the U.S. legislative process, a bill goes through a long process between being introduced in Congress to becoming law. A very small subset of bills introduced in Congress recieve a vote, and fewer bills become law. In the most recently Congress (116th) which ranged from January 3rd, 2019 to January 3rd, 2021, 16,601 bills and resolutions were introduced and proposed to Congress. Of those, only 746 (4%) were voted on, and 344 (2%) were enacted as laws. Our goal is to capture what language/features predict whether or not a bill warrants being passed into law. With such a small percentage of introduced bills ever becoming law, this information could potentially inform members of the House and Senate on how to make their bill of interest more likely to receive a vote and eventually pass.
+To give some context to the U.S. legislative process, a bill goes through a long process between being introduced in Congress to becoming law. A very small subset of bills introduced in Congress receive a vote, and fewer bills become law. In the most recently Congress (116th) which ranged from January 3rd, 2019 to January 3rd, 2021, 16,601 bills and resolutions were introduced and proposed to Congress. Of those, only 746 (4%) were voted on, and 344 (2%) were enacted as laws. Our goal is to capture what language/features predict whether or not a bill warrants being passed into law. With such a small percentage of introduced bills ever becoming law, this information could potentially inform members of the House and Senate on how to make their bill of interest more likely to receive a vote and eventually pass.
 
 ## Data
 
