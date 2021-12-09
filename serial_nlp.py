@@ -79,7 +79,7 @@ def main(credentials):
     r_df.to_csv('data.csv')
     s3.put_object(Bucket='macs30123-bills', Key='data.csv', ACL='public-read')
 
-credentials_file = int(sys.argv[1])
+credentials_file = str(sys.argv[1])
 if __name__ == '__main__': 
     # module load python/anaconda-2019.03
     # scp 'D:\Everything\UChicago\Fall 2021\MACS 30123\Project\credentials.txt' "jmidkiff@midway2.rcc.uchicago.edu:/home/jmidkiff/PROJECT_MACS30123/credentials.txt" 
