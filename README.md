@@ -100,7 +100,9 @@ A number of regression and classification models were considered when deciding o
 
 ![image](https://user-images.githubusercontent.com/81605602/145544505-c412ab14-c0b3-4cf5-8686-ca1b52c306d2.png)
 
-As we can observe, with an AUC score of 0.94, our model performs exceptionally well when predicting the outcome of a bill between pass or fail. Looking further, we can also examine our feature coefficients to see how those influence the outcome.
+As we can observe, with an AUC score of 0.94, our model performs exceptionally well when predicting the outcome of a bill between pass or fail. Looking further, we can also examine our feature coefficients to see how those influence the outcome.\
+The Training Accuracy of our model was 0.977034411460641 and the Test Accuracy was 0.975150992234685, which are both very high as well.\
+Additional AUC scores, accuracy scores, and rates of false or true positive can be found in the spark_bill_ml.ipynb Notebook.
 
 ![image](https://user-images.githubusercontent.com/81605602/145545199-14b736cb-d59a-49e7-95d4-d01d69f3c19f.png)
 
