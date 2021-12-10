@@ -112,13 +112,14 @@ For further clarity on our model, we computed an observation matrix which can be
 ![image](https://user-images.githubusercontent.com/81605602/145546049-27d4fe15-a61d-4f73-bdaf-ce139cfcc0d2.png)
 
 These correspond to the following accuracy scores:\
-Precision score for our model is 0.9997640813919197\
-Recall score for our model is 0.9753725760975891\
-The F-score for our model is 0.987417720044271
+Accuracy score for our model is 0.975150992234685\
+Precision score for our model is 0.3333333333333333\
+Recall score for our model is 0.004651162790697674\
+The F-score for our model is 0.009174311926605505
 
-So, what does this tell us? Well for one, our model has extremely high accuracy scores across the board! However, this is also likely explained because the model predicts that most bills will fail because most bills do fail! Since our dataset is relatively small in relation to all the bills that have gone through Congress since its inception, our sample size might not be very informative outside of our specified timeline (113 Congress - 116 Congress). In particular, we must acknowledge that most of our dataset consists of bills that have failed. So while our model has extremely high precision, recall, and F scores across the board, we must also note that the model has trained on data that was skewed towards failed bills to begin with. We considered downsampling the failed bills to combat this, but ultimately did not because we would lost a large amount of data.
+So, what does this tell us? Well for one, our model has extremely high accuracy scores! Unfortunately, our precision and recall score are both much lower. This is likely explained because the model predicts that most bills will fail because most bills do fail! Since our dataset is relatively small in relation to all the bills that have gone through Congress since its inception, our sample size might not be very informative outside of our specified timeline (113 Congress - 116 Congress). In particular, we must acknowledge that most of our dataset consists of bills that have failed. So while our model has extremely high accuracy, we must also note that the model has much lower precision that is likely caused when it was trained on data that was skewed towards failed bills to begin with. We considered downsampling the failed bills to combat this, but ultimately did not because we would lost a large amount of data.
 
-In summation, our Multivariate Logistic Regression Model did exactly what it set out to do. With a relatively high degree of precision and recall, the model is able to distinguish between bills that are likely to pass, and bills that are not. Of course, we must acknowledge the different biases that may have found their way into the model as noted above. Looking forward, we would need to find a way to increase the data to make it more balanced between passed bills and failed bills. We also observed how features like subjectivity and polarity of the bill text, along with word_count_scaled and sponsor_count correlated with our predicted outcome.
+In summation, our Multivariate Logistic Regression Model did more or less what it set out to do. With a relatively high degree of accuracy but a low degree of precision, the model is able to find some way to distinguish between bills that are likely to pass, and bills that are not. Of course, we must acknowledge the different biases that may have found their way into the model as noted above. Looking forward, we would need to find a way to increase the data to make it more balanced between passed bills and failed bills. We also observed how features like subjectivity and polarity of the bill text, along with word_count_scaled and sponsor_count correlated with our predicted outcome.
 
 ## Conclusion
 
