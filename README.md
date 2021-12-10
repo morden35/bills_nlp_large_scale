@@ -88,10 +88,40 @@ It was disappointing to find that parallelizaton was not practical here, but an 
 
 ## Machine Learning on EMR using PySpark
 
+Once we had the bill data and the congress data available to us in our S3 bucket, we began by loading it in on AWS Console through EMR. This was done by creating an EMR Cluster and then creating the notebook. For the following, please refer to the spark_bill_ml.ipynb Notebook which ran the following model on EMR.
+
+After reading in the data and consolidating it into a dataframe, we then converted it from Pandas to a PySpark dataframe. As we have learned, PySpark gives us the capacity to run machine learning models on multiple machines, as opposed to Pandas which only runs on a single machine. Specifically, PySpark has the capacity to run on multiple nodes, which is important when dealing with large datasets. Although we could have done the project in Pandas, doing it in PySpark allows us to run our model more efficiently and also gives us the ability to scale up our model as needed with additional data.
+
+Our final consolidated PySpark dataframe consisted of 58011 rows and 17 columns. Out of these 17 columns, we wanted to narrow down the features that we would use to predict whether or not a bill will be passed. In accordance with the group, we decided on the following features:\
+['sponsor_count', 'section_count', 'word_count_scaled', 'subjectivity', 'polarity', '% Democrat', '% Republican']\
+We originally planned on using original word_count as a feature, but noticed that the word counts of various bills introduced to Congress had extremely high variance. Therefore, we decided it would be more optimal to run the word_count through a Standard Scaler to normalize the column into a scaled version that we then could pass on as a feature into our ML model. Sponsor count and section count were not normalized since they had far less variance, and because the nature of these features made more sense to keep it as is. For instance, we want to know how each additional bill sponsor affects the likelihood of the outcome. Polarity and Subjectivity scores are two continuous variables that were taken from the previously conducted NLP Sentiment Analysis. And % Democrat and % Republican represent the political makeup of Congress. These 7 continuous features in total will be used to drive our model to use past historical bill data to inform on future bill passage. 
+
+A number of regression and classification models were considered when deciding on the overlay of the project. Given our scope, and our desired outcome, we settled on using Multivariate Logistic Regression to create our model. This was the ideal model for a number of reasons. First, the outcome we want to predict, which is whether or not a bill is successfully passed into law, is a binary outcome. Logistic Regression does exceptionally well when predicting binary outcomes. Additionally, a Logistic Regression model is easier to implement given the scope of our project, and also very efficient to train. So using PySpark, we created the model and ran it on our randomly split training and test sets, using an 80-20 split. The resulting ROC Curve is as follows.
+
+![image](https://user-images.githubusercontent.com/81605602/145544505-c412ab14-c0b3-4cf5-8686-ca1b52c306d2.png)
+
+As we can observe, with an AUC score of 0.94, our model performs exceptionally well when predicting the outcome of a bill between pass or fail. Looking further, we can also examine our feature coefficients to see how those influence the outcome.
+
+![image](https://user-images.githubusercontent.com/81605602/145545199-14b736cb-d59a-49e7-95d4-d01d69f3c19f.png)
+
+Immediately, we can notice that features section_count, % Democrat, and % Republican have virtually no correlation with whether or not a bill is likely to pass. Sponsor_count is slightly negatively correlated, at about -2.5% with a one-unit increase in the sponsors. We can also observe that the highest coefficient is from word_count_scaled, with a 1 unit increase in word_count_scaled attributed to an approximate 15% increase in the likelihood of a bill passing. However, it is important to mention that scaling the word_count makes this feature more skewed, since one unit corresponds to a large increase in words. We can also observe that subjectivity is negatively correlated with the outcome whereas polarity is positively correlated. From this we can infer that as the bill text becomes more subjective by one-unit, the bill is about 6% less likely to pass! In contrast, a one-unit increase in polarity (positive sentiment) means that the bill is about 5% more likely to pass! 
+
+For further clarity on our model, we computed an observation matrix which can be used to observe the model performance on the test set.\
+![image](https://user-images.githubusercontent.com/81605602/145546049-27d4fe15-a61d-4f73-bdaf-ce139cfcc0d2.png)
+
+These correspond to the following accuracy scores:\
+Precision score for our model is 0.9997640813919197\
+Recall score for our model is 0.9753725760975891\
+The F-score for our model is 0.987417720044271\
+
+So, what does this tell us? Well for one, our model has extremely high accuracy scores across the board! However, this is also likely explained because the model predicts that most bills will fail because most bills do fail! Since our dataset is relatively small in relation to all the bills that have gone through Congress since its inception, our sample size might not be very informative outside of our specified timeline (113 Congress - 116 Congress). In particular, we must acknowledge that most of our dataset consists of bills that have failed. So while our model has extremely high precision, recall, and F scores across the board, we must also note that the model has trained on data that was skewed towards failed bills to begin with. We considered downsampling the failed bills to combat this, but ultimately did not because we would lost a large amount of data.
+
+In summation, our Multivariate Logistic Regression Model did exactly what it set out to do. With a relatively high degree of precision and recall, the model is able to distinguish between bills that are likely to pass, and bills that are not. Of course, we must acknowledge the different biases that may have found their way into the model as noted above. Looking forward, we would need to find a way to increase the data to make it more balanced between passed bills and failed bills. We also observed how features like subjectivity and polarity of the bill text, along with word_count_scaled and sponsor_count correlated with our predicted outcome.
+
 ## Conclusion
 
 ## Project Breakdown by Group Member
-Kelly: Conducted sentiment analysis on bill text for feature creation by computing subjectivity and polarity scores. Gathered and transformed congress data on party breakdowns into a csv. Collected the data from our S3 bucket. Once the bills were loaded in together on AWS, prepped the datasets, consolidated the dataframes, and vector assembled the features. Then read it into a PySpark DataFrame via AWS on an EMR Cluster. Created and ran the PySpark Logistic Regression Machine Learning Model with our dataset and tested the predictive model. Reported various metrics, created a confusion matrix, and computed accuracy scores.\
+Kelly: Conducted sentiment analysis on bill text for feature creation by computing subjectivity and polarity scores. Gathered and transformed congress data on party breakdowns into a csv. Collected the data from our S3 bucket. Once the bills were loaded in together on AWS, prepped the datasets, consolidated the dataframes, and vector assembled the features. Then read it into a PySpark DataFrame via AWS on an EMR Cluster. Created and ran the PySpark Logistic Regression Machine Learning Model with our dataset and tested the predictive model. Reported various metrics, created a confusion matrix, and computed accuracy scores. Finally, we all contributed o the writeup and presentation.\
 Michelle:\
 James:
 
