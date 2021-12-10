@@ -60,7 +60,7 @@ See [here](https://www.govinfo.gov/help/bills) for a list of abbreviations for b
 
 </br>
 </br>
-<img src="Images/correlation.PNG">
+<img src="Images/correlation.png">
 Here we explore the correlation between our textual features. As could perhaps be expected, there is near perfect correlation between increasing the number of sections in a congressional bill and the total word count. Most other features are not closely related to each other, except for the polarity and subjectivity scores, which have a mildly positive correlation. 
 
 While we first attempted to use Dask on the University of Chicago Midway2 computing system in `Old/nlp.py` so as to exploit data parallelization, for several reasons it proved far more practical to perform the Natural Language Processing in a serial format:  
