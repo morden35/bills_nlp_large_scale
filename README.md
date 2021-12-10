@@ -38,30 +38,45 @@ And we import several functions from the `textblob` natural language processing 
 
 We then visualized these text features and note several interesting observations:  
 
-<img src="Images/total_versions.png">
 In our dataset, the number of bills has increased over time, with the Senate generally having about one-half of the bills that the House of Representatives does.  
+<p align="center">
+  <img src="Images/total_versions.png" width="665" height="400">
+</p>
 
 </br>
 </br>
-<img src="Images/proportion_passed.png">
-Nonetheless, both chambers of Congress exhibit remarkable similarity in terms of the bill outcomes. Only about 2% of bills from each Chamber are passed in any given year. 
+Nonetheless, both chambers of Congress exhibit remarkable similarity in terms of the bill outcomes. Only about 2% of bills from each Chamber are passed in any given session.  
+<p align="center">
+  <img src="Images/proportion_passed.png" width="665" height="400">
+</p>
 
 </br>
 </br>
-We use these features and others described later to predict which bills and bill verions have been "Passed" by Congress -- those whose status is 'enrolled' -- vs. all other bills, which we consider to be "Not Passed". 
-<img src="Images/word_count_percentiles.png">
-Arranging "Passed" and "Not Passed" bills by their total word count, we find that "Passed" bills generally have a lower word count than "Not Passed" bills up through the 80th percentile of each type. Beyond this point, however, "Passed" bills begin expponentially surpassing "Not Passed" bills in word count. 
+We use these features and others described later to predict which bills and bill verions have been "Passed" by Congress -- those whose status is 'enrolled' -- vs. all other bills, which we consider to be "Not Passed".  
+
+Arranging "Passed" and "Not Passed" bills by their total word count, we find that "Passed" bills generally have a lower word count than "Not Passed" bills up through the 80th percentile of each type. Beyond this point, however, "Passed" bills begin expponentially surpassing "Not Passed" bills in word count.  
+
+<p align="center">
+   <img src="Images/word_count_percentiles.png" width="665" height="400">
+</p>
+
 
 We speculate a couple possible reasons for this: 
 * Uncontroversial bills may concern minutae that do not require lengthy laws to address, such as from the 113th Session HR1071 "An Act To specify the size of the precious-metal blanks that will be used in the production of the National Baseball Hall of Fame commemorative coins.", which has a word count of 102. 
-* Highly public and debated legislation may require more concessions, amendments, and "pork" that add to the bill's overall length in order for passage to occur. For example, the 2017 Tax Cuts and Jobs Act (a.k.a. the Trump Tax Cuts), HR1 from the 115th Session of Congress increased notably in size between its introduction in the house, to its eventual enactment: 
-<img src="Images/115HR1.PNG" width="305" height="180">  
-See [here](https://www.govinfo.gov/help/bills) for a list of abbreviations for bill outcomes. 
+* Highly public and debated legislation may require more concessions, amendments, and "pork" that add to the bill's overall length in order for passage to occur. For example, the 2017 Tax Cuts and Jobs Act (a.k.a. the Trump Tax Cuts), HR1 from the 115th Session of Congress increased notably in size between its introduction in the house, to its eventual enactment (see the help files https://www.govinfo.gov/help/bills for a list of abbreviations for bill outcomes):  
+
+<p align="center">
+  <img src="Images/115HR1.PNG" width="305" height="180">  
+</p>
+
 
 </br>
 </br>
-<img src="Images/correlation.png">
-Here we explore the correlation between our textual features. As could perhaps be expected, there is near perfect correlation between increasing the number of sections in a congressional bill and the total word count. Most other features are not closely related to each other, except for the polarity and subjectivity scores, which have a mildly positive correlation. 
+Here we explore the correlation between our textual features. As could perhaps be expected, there is near perfect correlation between increasing the number of sections in a congressional bill and the total word count. Most other features are not closely related to each other, except for the polarity and subjectivity scores, which have a mildly positive correlation.  
+
+<p align="center">
+  <img src="Images/correlation.png" width="665" height="400">
+</p>
 
 While we first attempted to use Dask on the University of Chicago Midway2 computing system in `Old/nlp.py` so as to exploit data parallelization, for several reasons it proved far more practical to perform the Natural Language Processing in a serial format:  
 1. Despite signifcant debugging, Dask was unable to read json files directly from S3, so we were forced to read the data in a non-distributed format via Pandas
@@ -69,7 +84,7 @@ While we first attempted to use Dask on the University of Chicago Midway2 comput
 3. The data was text-based and stored in dataframes (rather than numeric and stored in Numpy arrays), so MPI parallelization would struggle to work with it. 
 4. The dataset was small enough (approx. 2Gb) that Pandas was still capable of holding everything in memory. 
 
-While it was disappointing to find that parallelizaton was not practical here, an important piece of parallel computing is knowing when it is not worthwhile. 
+It was disappointing to find that parallelizaton was not practical here, but an important part of parallel computing is knowing when it is not worthwhile. 
 
 ## Machine Learning on EMR using PySpark
 
@@ -87,4 +102,6 @@ While it was disappointing to find that parallelizaton was not practical here, a
 
 ## Citations
 
+Congressional Bills: https://www.govinfo.gov/bulkdata/BILLS
+Bill outcome descriptions: https://www.govinfo.gov/help/bills 
 Source for statistics: https://www.govtrack.us/congress/bills/statistics
