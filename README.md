@@ -102,6 +102,6 @@ It was disappointing to find that parallelizaton was not practical here, but an 
 
 ## Citations
 
-Congressional Bills: https://www.govinfo.gov/bulkdata/BILLS
-Bill outcome descriptions: https://www.govinfo.gov/help/bills 
-Source for statistics: https://www.govtrack.us/congress/bills/statistics
+* Congressional Bills: https://www.govinfo.gov/bulkdata/BILLS  
+* Bill outcome descriptions: https://www.govinfo.gov/help/bills  
+* Source for statistics: https://www.govtrack.us/congress/bills/statistics  
