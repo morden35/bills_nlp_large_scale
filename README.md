@@ -7,7 +7,7 @@ Kelly Yang<br/>
 
 ## Introduction
 
-The United States is becoming more politically divided over time, making it more difficult for legislation to gain enough votes to pass and eventually become law. A major factor of whether or not a given bill passes can be attributed to a number of variables outside of the bills itself, such as which party holds majority power at the time of vote, which party holds the presidency, which session of Congress is active at the time the bill is introduced, etc. The passage of a congressional bill is also influenced by characteristics of the text of the bill itself, such as how many words are contained in the bill, the number of sections in the bill, and the number of sponsors the bill has. In this project, our group explores how features related to a given bill determine whether or not a bill passes or fails. We do so using a Logistic Regression model, as well as Large-Scale Computing tools such as Dask, PySPark, AWS EMR clusters, and AWS S3 buckets.
+The United States is becoming more politically divided over time, making it more difficult for legislation to gain enough votes to pass and eventually become law. A major factor of whether or not a given bill passes can be attributed to a number of variables outside of the bills itself, such as which party holds majority power at the time of vote and which session of Congress is active at the time the bill is introduced. The passage of a congressional bill is also influenced by characteristics of the text of the bill itself, such as how many words are contained in the bill, the number of sections in the bill, and the number of sponsors the bill has. In this project, our group explores how features related to a given bill determine whether or not a bill passes or fails. We do so using a Logistic Regression model, as well as Large-Scale Computing tools such as PySpark, AWS EMR clusters, and AWS S3 buckets.
 
 
 ## Domain Knowledge
@@ -24,16 +24,67 @@ Fortunately, our datasource has a Bulk Data Repository (https://www.govinfo.gov/
 
 Additionally, we decided to keep only House and Senate bills, and filter our resolutions. Ultimately, we were able to collect all House and Senate bill texts from the 113th (11,479 bills), 114th (13,541 bills), 115th (15,527 bills), and 116th (17,452 bills) congress, which spans from January 3rd, 2013 to January 3, 2021. This accumulated to a total of 57,999 bill texts. In future iterations of this project, we would like to complete the analysis using all available bill texts (available bill texts date back to the 103rd Congress, which began on January 5th, 1993).
 
-## Natural Language Processing on Midway using Dask
+## Natural Language Processing
+In this section, we create and analyze various features using the text of the bills themselves. When we say "bills", we also refer to each different version of a bill as a separate bill because the text of a bill changes over time, and we are interested in the text that is in the version of bill that is ultimately passed. Due to the amending process we believe that the text in a bill influences whether or not a bill is passed, and thus it makes sense to consider as "failed" early versions of a bill that is ultimately enacted. 
+
+In the `serial_nlp.py` file, we generate the following features via text parsing (regular expressions): 
+* sponsor_count - A count of the total number of congressional sponsors of the bill
+* section_count - A count of the number of 'sections' of the bill and 'sections' of other bills that the bill in question amends
+* word_count - The number of total words in the bill itself
+
+And we import several functions from the `textblob` natural language processing Python module: 
+* subjectivity - A measure of how 'subjective' or 'objective' the text is
+* polarity - A measure of how 'positive' or 'negative' the text is
+
+We then visualized these text features and note several interesting observations:  
+
+<img src="Images/total_versions.png">
+In our dataset, the number of bills has increased over time, with the Senate generally having about one-half of the bills that the House of Representatives does.  
+
+</br>
+</br>
+<img src="Images/proportion_passed.png">
+Nonetheless, both chambers of Congress exhibit remarkable similarity in terms of the bill outcomes. Only about 2% of bills from each Chamber are passed in any given year. 
+
+</br>
+</br>
+We use these features and others described later to predict which bills and bill verions have been "Passed" by Congress -- those whose status is 'enrolled' -- vs. all other bills, which we consider to be "Not Passed". 
+<img src="Images/word_count_percentiles.png">
+Arranging "Passed" and "Not Passed" bills by their total word count, we find that "Passed" bills generally have a lower word count than "Not Passed" bills up through the 80th percentile of each type. Beyond this point, however, "Passed" bills begin expponentially surpassing "Not Passed" bills in word count. 
+
+We speculate a couple possible reasons for this: 
+* Uncontroversial bills may concern minutae that do not require lengthy laws to address, such as from the 113th Session HR1071 "An Act To specify the size of the precious-metal blanks that will be used in the production of the National Baseball Hall of Fame commemorative coins.", which has a word count of 102. 
+* Highly public and debated legislation may require more concessions, amendments, and "pork" that add to the bill's overall length in order for passage to occur. For example, the 2017 Tax Cuts and Jobs Act (a.k.a. the Trump Tax Cuts), HR1 from the 115th Session of Congress increased notably in size between its introduction in the house, to its eventual enactment: 
+<img src="Images/115HR1.PNG" width="305" height="180">  
+See [here](https://www.govinfo.gov/help/bills) for a list of abbreviations for bill outcomes. 
+
+</br>
+</br>
+<img src="Images/correlation.PNG">
+Here we explore the correlation between our textual features. As could perhaps be expected, there is near perfect correlation between increasing the number of sections in a congressional bill and the total word count. Most other features are not closely related to each other, except for the polarity and subjectivity scores, which have a mildly positive correlation. 
+
+While we first attempted to use Dask on the University of Chicago Midway2 computing system in `Old/nlp.py` so as to exploit data parallelization, for several reasons it proved far more practical to perform the Natural Language Processing in a serial format:  
+1. Despite signifcant debugging, Dask was unable to read json files directly from S3, so we were forced to read the data in a non-distributed format via Pandas
+2. The AWS starter accounts are unable to launch EMR cluster notebooks
+3. The data was text-based and stored in dataframes (rather than numeric and stored in Numpy arrays), so MPI parallelization would struggle to work with it. 
+4. The dataset was small enough (approx. 2Gb) that Pandas was still capable of holding everything in memory. 
+
+While it was disappointing to find that parallelizaton was not practical here, an important piece of parallel computing is knowing when it is not worthwhile. 
 
 ## Machine Learning on EMR using PySpark
 
 ## Conclusion
-  
-## Project Breakdown:
-Kelly: Conducted sentiment analysis on bill text for feature creation. Gathered and turned the congress data on party breakdowns into a csv. Collected the data from our S3 bucket. Once the bills were loaded in together, prepped the datasets, consolidated the frames, and vector assembled the features. Then read it into a PySpark DataFrame via AWS on an EMR Cluster. Created and ran the Logistic Regression Machine Learning Model with our dataset and tested the predictive model. Reported various metrics, created a confusion matrix, and computed accuracy scores.
+
+## Code Authorship
+* [s3_set_up.ipynb]() - Michelle Orden
+* [get_bills.ipynb]() - Michelle Orden
+* [convert_xml.ipynb]() - Michelle Orden
+* [serial_nlp.py]()<insert serial_nlp.py> - James Midkiff
+* [util.py]()<insert util.py> - Kelly Yang
+* [Congressional Bill Visualizations.ipynb]()<insert Congressional Bill Visualizations.ipynb> - James Midkiff
+* [spark_bill_ml.ipynb]() - Kelly Yang
+* [nlp.py]()<insert Old_nlp.py> (unused) - James Midkiff
 
 ## Citations
-  
 
 Source for statistics: https://www.govtrack.us/congress/bills/statistics
