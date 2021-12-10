@@ -112,7 +112,7 @@ For further clarity on our model, we computed an observation matrix which can be
 These correspond to the following accuracy scores:\
 Precision score for our model is 0.9997640813919197\
 Recall score for our model is 0.9753725760975891\
-The F-score for our model is 0.987417720044271\
+The F-score for our model is 0.987417720044271
 
 So, what does this tell us? Well for one, our model has extremely high accuracy scores across the board! However, this is also likely explained because the model predicts that most bills will fail because most bills do fail! Since our dataset is relatively small in relation to all the bills that have gone through Congress since its inception, our sample size might not be very informative outside of our specified timeline (113 Congress - 116 Congress). In particular, we must acknowledge that most of our dataset consists of bills that have failed. So while our model has extremely high precision, recall, and F scores across the board, we must also note that the model has trained on data that was skewed towards failed bills to begin with. We considered downsampling the failed bills to combat this, but ultimately did not because we would lost a large amount of data.
 
