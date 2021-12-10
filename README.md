@@ -90,6 +90,11 @@ It was disappointing to find that parallelizaton was not practical here, but an 
 
 ## Conclusion
 
+## Project Breakdown by Group Member
+Kelly: Conducted sentiment analysis on bill text for feature creation by computing subjectivity and polarity scores. Gathered and transformed congress data on party breakdowns into a csv. Collected the data from our S3 bucket. Once the bills were loaded in together on AWS, prepped the datasets, consolidated the dataframes, and vector assembled the features. Then read it into a PySpark DataFrame via AWS on an EMR Cluster. Created and ran the PySpark Logistic Regression Machine Learning Model with our dataset and tested the predictive model. Reported various metrics, created a confusion matrix, and computed accuracy scores.\
+Michelle:\
+James:
+
 ## Code Authorship
 * [s3_set_up.ipynb]() - Michelle Orden
 * [get_bills.ipynb]() - Michelle Orden
