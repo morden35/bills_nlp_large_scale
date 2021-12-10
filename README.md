@@ -128,7 +128,7 @@ In conclusion, our multivariate logistic regression model was very accurate in p
 Although our model accuracy score was very high, the precision and recall scores indicate that there is still much to be desired. As mentioned before, we could rectify this by potentially downsampling the amount of bills in our training set that fail. However, because the vast majority of bills that are introduced to Congress never get passed, we would need to massively scale up our dataset and include further years of Congress beyond our scope. Thankfully, due to the various large-scale computing methods we used, including Dask, PySpark, and running EMR Clusters, we think that the model can be run efficiently and effectively with larger amounts of data.
 
 ## Project Breakdown by Group Member
-Michelle:\
+Michelle: Michelle was responsible for acquiring the bill data. She wrote s3_set_up.ipynb to set up the S3 bucket, get_bills.ipynb to acquire bill texts via the govinfo api, and  convert_xml.ipynb to convert xml files to json.
 
 James: Received raw JSON data from S3 bucket, generated new text features, imported and deployed `textblob` NLP functions from Kelly Yang, performed Exploratory Data Analysis which included generating visualizations, exported features data in usable format. 
 
