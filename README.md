@@ -123,6 +123,10 @@ In summation, our Multivariate Logistic Regression Model did more or less what i
 
 ## Conclusion
 
+In conclusion, our multivariate logistic regression model was very accurate in predicting whether or a bill would pass. We can also observe from our features that certain metrics like word_count_scaled have the highest positive correlation. A one-unit increase in the deviation of word_count of a bill would lead to an almost 15% increase in likelihood that the bill passes. With our sentiment analysis, we saw that bills containing text deemed to be more subjective were less likely to pass, and bills with a positive sentiment in the text were more likely to pass. Increasing sponsors also made it less likely for a bill to pass.
+
+Although our model accuracy score was very high, the precision and recall scores indicate that there is still much to be desired. As mentioned before, we could rectify this by potentially downsampling the amount of bills in our training set that fail. However, because the vast majority of bills that are introduced to Congress never get passed, we would need to massively scale up our dataset and include further years of Congress beyond our scope. Thankfully, due to the various large-scale computing methods we used, including Dask, PySpark, and running EMR Clusters, we think that the model can be run efficiently and effectively with larger amounts of data.
+
 ## Project Breakdown by Group Member
 Kelly: Conducted sentiment analysis on bill text for feature creation by computing subjectivity and polarity scores. Gathered and transformed congress data on party breakdowns into a csv. Collected the data from our S3 bucket. Once the bills were loaded in together on AWS, prepped the datasets, consolidated the dataframes, and vector assembled the features. Then read it into a PySpark DataFrame via AWS on an EMR Cluster. Created and ran the PySpark Logistic Regression Machine Learning Model with our dataset and tested the predictive model. Reported various metrics, created a confusion matrix, and computed accuracy scores. Finally, we all contributed o the writeup and presentation.\
 Michelle:\
