@@ -29,7 +29,11 @@ Additionally, we decided to keep only House and Senate bills, and filter our res
 ## Machine Learning on EMR using PySpark
 
 ## Conclusion
+  
+## Project Breakdown:
+Kelly: Conducted sentiment analysis on bill text for feature creation. Gathered and turned the congress data on party breakdowns into a csv. Collected the data from our S3 bucket. Once the bills were loaded in together, prepped the datasets, consolidated the frames, and vector assembled the features. Then read it into a PySpark DataFrame via AWS on an EMR Cluster. Created and ran the Logistic Regression Machine Learning Model with our dataset and tested the predictive model. Reported various metrics, created a confusion matrix, and computed accuracy scores.
 
 ## Citations
+  
 
 Source for statistics: https://www.govtrack.us/congress/bills/statistics
