@@ -1,8 +1,8 @@
 # Predicting Congressional Bill Outcomes using Machine Learning and Large-Scale Computing Methods
 
 ## Team members:
-James Midkiff<br/>
 Michelle Orden<br/>
+James Midkiff<br/>
 Kelly Yang<br/>
 
 ## Introduction
